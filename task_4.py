@@ -3,6 +3,7 @@ import warnings
 import urllib3
 import pandas as pd
 import logging
+from io import StringIO
 from pathlib import Path
 from typing import Optional
 import os
@@ -28,10 +29,9 @@ logging.basicConfig(
 # ── MAIN FUNCTION ─────────────────────────────────────────────────────────────
 def run_vehiclemaster(phpsessid: str) -> Optional[pd.DataFrame]:
     """
-    Fetch vehicle master table from mena-atms and save as JSON.
+    Fetch vehicle master table from mena-atms and save as Excel.
     Returns the cleaned DataFrame.
     """
-    # --- Path detection ---
     # --- Path detection (serverless vs local) ---
     if Path("/tmp").exists():
         save_dir = Path("/tmp") / "data"
@@ -39,10 +39,15 @@ def run_vehiclemaster(phpsessid: str) -> Optional[pd.DataFrame]:
         save_dir = Path.cwd() / "data"
     save_dir.mkdir(parents=True, exist_ok=True)
 
+    # --- Request setup ---
     headers = {
         "Referer": BASE_URL,
         "Cookie": f"PHPSESSID={phpsessid}",
-        "User-Agent": "Mozilla/5.0",
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/140.0.0.0 Safari/537.36"
+        ),
     }
 
     try:
@@ -56,37 +61,56 @@ def run_vehiclemaster(phpsessid: str) -> Optional[pd.DataFrame]:
     if not resp.encoding:
         resp.encoding = resp.apparent_encoding
 
-    # Parse all tables
+    # --- Parse HTML tables safely ---
     try:
-        tables = pd.read_html(resp.text, displayed_only=False)
+        tables = pd.read_html(StringIO(resp.text), displayed_only=False)
     except ValueError:
         logging.error("No HTML tables found in vehicle master response.")
+        return None
+    except Exception as e:
+        logging.error(f"HTML parsing error: {e}")
         return None
 
     if not tables:
         logging.warning("No tables parsed from vehicle master HTML.")
         return None
 
-    # Pick largest table
+    # --- Select the largest table (usually the main vehicle list) ---
     df = max(tables, key=lambda t: t.shape[0] * t.shape[1])
 
-    # Clean columns
+    # --- Clean columns ---
     df.columns = df.columns.map(lambda c: str(c).strip())
     df = df.loc[:, ~df.columns.astype(str).str.contains(r"^Unnamed", case=False)]
     df = df.astype(str)
 
-    # Keep important columns (if present)
+    # --- Filter columns if present ---
     keep_cols = ["ทะเบียน", "เลขรถ", "ประเภทรถร่วม", "ประเภทยานพาหนะ", "ประเภทยานพาหนะเพิ่มเติม"]
     existing_cols = [col for col in keep_cols if col in df.columns]
     df = df[existing_cols]
 
-    # Save to excel
+    # --- Ensure output folder exists ---
+    os.makedirs("raw_data", exist_ok=True)
+    output_path = Path("raw_data") / "vehiclemaster.xlsx"
 
-    
-    df.to_excel("raw_data/vehiclemaster.xlsx", index=False)
-
+    # --- Save to Excel ---
+    try:
+        df.to_excel(output_path, index=False)
+        logging.info(f"✅ Saved vehicle master to {output_path}")
+    except Exception as e:
+        logging.error(f"Failed to save Excel file: {e}")
+        return None
 
     return df
-phpsessid = os.getenv("PHPSESSID")
 
-run_vehiclemaster(phpsessid)
+
+# ── ENTRY POINT ───────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    phpsessid = "nn0jiufk4njcd956rovb0isk8u"
+    if not phpsessid:
+        print("❌ PHPSESSID not found in environment variables.")
+    else:
+        result = run_vehiclemaster(phpsessid)
+        if result is not None:
+            print(f"✅ Vehicle master fetched successfully ({len(result)} rows).")
+        else:
+            print("⚠️ Failed to fetch vehicle master.")
