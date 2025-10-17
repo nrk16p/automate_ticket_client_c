@@ -69,11 +69,12 @@ def get_token():
 def get_report(date_from: str, date_to: str, max_retries: int = 3):
     """Fetch report data from CPAC API with retry mechanism"""
     access_token = get_token()
-
     headers = {
         "Authorization": f"Bearer {access_token}",
         "x-audient": AUDIENT,
         "x-signature": SIGNATURE,
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/140.0.0.0 Safari/537.36",
+        "Referer": "https://portal.cpac.co.th",
         "Accept": "application/json",
     }
 
