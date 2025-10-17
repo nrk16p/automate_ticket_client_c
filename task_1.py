@@ -29,7 +29,7 @@ print(f"SIGNATURE: {SIGNATURE}")
 # ==================================
 def get_token():
     """Get access token from file or request a new one"""
-    auth = (CPAC_USERNAME, CPAC_PASSWORD)
+    auth = (USERNAME, PASSWORD)
     payload = {"grant_type": "client_credentials"}
 
     response = requests.post(AUTH_URL, data=payload, auth=auth)
