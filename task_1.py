@@ -14,6 +14,11 @@ USERNAME = os.getenv("CPAC_USERNAME")
 PASSWORD = os.getenv("CPAC_PASSWORD")
 AUDIENT = os.getenv("CPAC_AUDIENT")
 SIGNATURE = os.getenv("CPAC_SIGNATURE")
+import os
+print("USERNAME:", os.getenv("CPAC_USERNAME"))
+print("PASSWORD:", os.getenv("CPAC_PASSWORD"))
+print("AUDIENT:", os.getenv("CPAC_AUDIENT"))
+print("SIGNATURE:", os.getenv("CPAC_SIGNATURE"))
 
 TOKEN_FILE = os.getenv("TOKEN_FILE")
 AUTH_URL = os.getenv("AUTH_URL")
