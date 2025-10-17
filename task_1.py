@@ -13,10 +13,11 @@ PASSWORD  = os.getenv("CPAC_PASSWORD")
 AUDIENT   = os.getenv("CPAC_AUDIENT")
 SIGNATURE = os.getenv("CPAC_SIGNATURE")
 
-TOKEN_FILE = os.getenv("TOKEN_FILE")
-AUTH_URL   = os.getenv("AUTH_URL")
-REPORT_URL = os.getenv("REPORT_URL")
+# ✅ Pull from Jenkins environment if set
+AUTH_URL = os.getenv("AUTH_URL", "https://api-cpac.scg.com/auth/oauth2/token")
+REPORT_URL = os.getenv("REPORT_URL", "https://api-cpac.scg.com/e-suppliers/external/api/report-download/search")
 
+TOKEN_FILE = os.getenv("TOKEN_FILE", "cpac_token.json")
 # Debug: confirm loaded (Jenkins masks in logs automatically)
 print(f"USERNAME: {USERNAME}")
 print(f"PASSWORD: {PASSWORD}")
