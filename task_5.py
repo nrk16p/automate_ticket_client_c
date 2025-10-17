@@ -39,7 +39,7 @@ with requests.Session() as s:
             "report_type": "ship.to"
         }
 
-        r = s.post(url, data=payload, headers=headers, verify=False, timeout=60000)
+        r = s.post(url_shipto, data=payload, headers=headers, verify=False, timeout=60000)
         r.raise_for_status()
 
         with io.BytesIO(r.content) as f:
