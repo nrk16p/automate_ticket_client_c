@@ -8,21 +8,21 @@ from datetime import datetime, timedelta
 # ==================================
 # Load Environment Variables
 # ==================================
-load_dotenv()
-
-USERNAME = os.getenv("CPAC_USERNAME")
-PASSWORD = os.getenv("CPAC_PASSWORD")
-AUDIENT = os.getenv("CPAC_AUDIENT")
+USERNAME  = os.getenv("CPAC_USERNAME")
+PASSWORD  = os.getenv("CPAC_PASSWORD")
+AUDIENT   = os.getenv("CPAC_AUDIENT")
 SIGNATURE = os.getenv("CPAC_SIGNATURE")
-import os
-print("USERNAME:", os.getenv("CPAC_USERNAME"))
-print("PASSWORD:", os.getenv("CPAC_PASSWORD"))
-print("AUDIENT:", os.getenv("CPAC_AUDIENT"))
-print("SIGNATURE:", os.getenv("CPAC_SIGNATURE"))
 
 TOKEN_FILE = os.getenv("TOKEN_FILE")
-AUTH_URL = os.getenv("AUTH_URL")
+AUTH_URL   = os.getenv("AUTH_URL")
 REPORT_URL = os.getenv("REPORT_URL")
+
+# Debug: confirm loaded (Jenkins masks in logs automatically)
+print(f"USERNAME: {USERNAME}")
+print(f"PASSWORD: {PASSWORD}")
+print(f"AUDIENT: {AUDIENT}")
+print(f"SIGNATURE: {SIGNATURE}")
+
 
 # ==================================
 # Step 1: Get or Load Token
