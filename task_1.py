@@ -28,21 +28,31 @@ print(f"SIGNATURE: {SIGNATURE}")
 # Step 1: Get or Load Token
 # ==================================
 def get_token():
-    """Get access token from file or request a new one"""
-    auth = (USERNAME, PASSWORD)
-    payload = {"grant_type": "client_credentials"}
+    payload = {
+        "grant_type": "client_credentials",
+        "client_id": AUDIENT,
+        "client_secret": SIGNATURE
+    }
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
 
-    response = requests.post(AUTH_URL, data=payload, auth=auth)
+    print(f"Requesting token from {AUTH_URL} ...")
 
+    response = requests.post(AUTH_URL, data=payload, headers=headers)
     if response.status_code == 200:
-        token_data = response.json()
-        access_token = token_data.get("access_token")
-        with open(TOKEN_FILE, "w") as f:
-            json.dump(token_data, f, indent=2)
-        print("✅ Token saved successfully.")
-        return access_token
+        token = response.json().get("access_token")
+        if token:
+            print("✅ Token retrieved successfully.")
+            # Optional: save to file if needed
+            if TOKEN_FILE:
+                with open(TOKEN_FILE, "w") as f:
+                    f.write(token)
+            return token
+        else:
+            raise Exception("❌ Token not found in response JSON.")
     else:
-        raise Exception(f"❌ Failed to get token: {response.text}")
+        raise Exception(f"❌ Failed to get token: {response.status_code} - {response.text}")
 
 
 # ==================================
