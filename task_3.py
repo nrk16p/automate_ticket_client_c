@@ -2,20 +2,15 @@ import requests
 import io
 import pandas as pd
 import warnings, urllib3, requests, io
-import os
-
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 #token for get data from atsm 
-PHPSESSID = os.getenv("PHPSESSID")
+PHPSESSID = "nn0jiufk4njcd956rovb0isk8u"
 #data url
-url_vehicledaily = os.getenv("url_vehicledaily")
+url = "https://www.mena-atms.com/report/print.out/print.excel/type/vehicle.daily.transaction"
 #header url
 headers = {
-    "Referer": url_vehicledaily,
+    "Referer": url,
     "Content-Type": "application/x-www-form-urlencoded",
     "Cookie": f"PHPSESSID={PHPSESSID}",
 }

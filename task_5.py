@@ -2,19 +2,14 @@ import requests
 import io
 import pandas as pd
 import warnings, urllib3, requests, io
-import os
-
-from dotenv import load_dotenv
-
-load_dotenv()
 
 #token for get data from atsm 
-PHPSESSID = os.getenv("PHPSESSID")
+PHPSESSID = "nn0jiufk4njcd956rovb0isk8u"
 #data url
-url_shipto = os.getenv("url_shipto")
+url = "https://www.mena-atms.com/report/excel/index.excel/type/ship.to"
 #header url
 headers = {
-    "Referer": url_shipto,
+    "Referer": url,
     "Content-Type": "application/x-www-form-urlencoded",
     "Cookie": f"PHPSESSID={PHPSESSID}",
 }
@@ -39,7 +34,7 @@ with requests.Session() as s:
             "report_type": "ship.to"
         }
 
-        r = s.post(url_shipto, data=payload, headers=headers, verify=False, timeout=60000)
+        r = s.post(url, data=payload, headers=headers, verify=False, timeout=60000)
         r.raise_for_status()
 
         with io.BytesIO(r.content) as f:
